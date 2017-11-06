@@ -1,0 +1,62 @@
+注册表 Run、RunOnce 键值解析
+ 
+绝大多数使用过 Windows 操作系统的用户都不会对注册表的 Run、RunOnce 键值感到陌生，但你真的了解所有这些键值的细节吗？让我们具体说来。
+本文在Win2000，WinXp、Vista、Win7系统中讲解Run、RunOnce注册表键值，涉及如下四个：
+HKEY_CURRENT_USER/Software/Microsoft/Windows/CurrentVersion/Run
+HKEY_CURRENT_USER/Software/Microsoft/Windows/CurrentVersion/RunOnce
+HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/Run
+HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/RunOnce
+ 
+一、总述
+HKEY_CURRENT_USER 代表当前用户，当前用户登录后才执行的操作。
+HKEY_LOCAL_MACHINE 代表当前机器，所有操作在用户登录前就执行了。
+Run 键值代表着开机启动项，也就是说在这个项下的键值会随着开机启动（这里的开机是指用户登录，也就是说只要有登录操作就会执行，注销然后登录，也会执行这个键值）。
+RunOnce 键值类似于 Run 键值，唯一的区别在于，RunOnce 键值只执行一次，操作执行后会被自动删除。
+ 
+二、Win2000、WinXp
+在 2000、Xp下，Windows对这四个注册表键值的处理完全一样。
+HKEY_CURRENT_USER/Software/Microsoft/Windows/CurrentVersion/Run：
+HKEY_CURRENT_USER/Software/Microsoft/Windows/CurrentVersion/RunOnce
+HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/Run
+1、进程由 Explorer 调起
+2、多个项可以同时运行起来，无先后顺序
+3、可以直接登录到桌面
+ 
+HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/RunOnce
+1、进程由 Explorer 调起
+2、多个项不可以同时运行起来，必须等待一个进程结束后，另外一个进程方可运行起来
+3、在所有进程结束前，不能登录到桌面
+ 
+三、Vista、Win7
+在 Vista、Win7 ，Windows 对这四个注册表键值的处理也完全一样，在 Vista、Win7 下，有完整性级别，requireAdministrator manifest（即exe上是否有小盾牌标志）的概念，所以情况稍微复杂些。
+无盾牌标志的程序
+HKEY_CURRENT_USER/Software/Microsoft/Windows/CurrentVersion/Run
+HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/Run
+HKEY_CURRENT_USER/Software/Microsoft/Windows/CurrentVersion/RunOnce
+1、进程由 Explorer 调起
+2、多个项可以同时运行起来，无先后顺序
+3、可以直接登录到桌面
+4、进程的完整级别为Medium Mandatory Level
+ 
+HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/RunOnce
+1、由 runonce.exe 调起，runonce.exe 由 Explorer调起，runonce.exe 的完整级别为High Mandatory Level
+2、多个项不可以同时运行起来，必须等待一个进程结束后，另外一个进程方可运行起来
+3、在所有进程结束前，不能登录到桌面
+4、进程的完整级别为High Mandatory Level
+5、进程结束后，runonce.exe 跟着结束
+ 
+有盾牌标志的程序
+HKEY_CURRENT_USER/Software/Microsoft/Windows/CurrentVersion/Run
+HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/Run
+HKEY_CURRENT_USER/Software/Microsoft/Windows/CurrentVersion/RunOnce
+1、由于权限问题，进程不会被运行
+ 
+HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/RunOnce
+1、由 runonce.exe 调起，runonce.exe 由 Explorer调起，runonce.exe 的完整级别为High Mandatory Level
+2、多个项不可以同时运行起来，必须等待一个进程结束后，另外一个进程方可运行起来
+3、在所有进程结束前，不能登录到桌面
+4、进程的完整级别为High Mandatory Level
+5、进程结束后，runonce.exe 跟着结束
+ 
+四、额外的 RunOnceEx 键值
+在 Win2000、WinXp中，存在一个特例的注册表键值RunOnceEx，注册表全路径为：HKEY_LOCAL_MACHINE/SOFTWARE/Microsoft/Windows/CurrentVersion/RunOnceEx。关于这个键值，99%的程序都不会用到，因此不做详细说明，微软官方的文档地址为：http://support.microsoft.com/kb/310593/en-us

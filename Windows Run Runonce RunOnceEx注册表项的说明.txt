@@ -1,0 +1,162 @@
+将 Run Runonce RunOnceEx 注册表项的说明
+
+
+概要
+本文介绍了 RunOnceEx 注册表键的功能。
+详细信息
+重要：此部分、 方法或任务包含一些介绍如何修改注册表的步骤。但是，如果不正确地修改了注册表，可能会出现严重的问题。因此，请确保仔细按照下列步骤操作。为增加保护，对其进行修改之前备份注册表。然后，您可以在出现问题时还原注册表。有关如何备份和还原注册表的详细信息，请单击下面的文章编号，以查看 Microsoft 知识库中相应的文章：
+322756如何备份和还原在 Windows 注册表
+RunOnceEx 具有以下功能︰
+
+状态︰ 正在处理包含在注册表项中的项时，将显示一个对话框。要处理的条目进行分组分成几个部分，并且对话框中突出显示当前正在处理的分区。您可以禁用状态对话框。
+性能︰ 大部分运行和 RunOnce 注册表项中包含的命令创建单独的进程，这是效率低下。将 RunOnceEx 注册表项不会创建一个单独的进程。RunOnceEx 注册表项也支持保持或者所有部分同时加载的 Dll 的依赖项列表，或正在处理的一些内容。
+错误处理︰ 如果调用 DLL 中的函数时发生异常，捕捉到该异常，并向用户显示一个错误对话框。使用 RunOnceEx 注册表项中的一个标志，可以禁止显示该错误对话框。您还可以设置一个标志，用于启用日志错误并运行 RunOnceEx 注册表项。
+确定性︰ RunOnceEx 注册表项进行排序的项和部分按字母顺序以确定性次序强制实施。
+Runonce.exe 和 Runonce.exe.mui 文件位于以下位置︰
+32-bit systems:--------------------
+C:\Windows\System32\runonce.exe
+ 
+Windows Vista and higher:
+C:\Windows\System32\en-US\runonce.exe.mui
+ 
+ 
+64-bit systems:
+--------------------
+64-bit processes:
+C:\Windows\System32\runonce.exe
+ 
+Windows Vista and higher:
+C:\Windows\System32\en-US\runonce.exe.mui
+ 
+ 
+32-bit processes:
+C:\Windows\SysWOW64\runonce.exe
+ 
+Windows Vista and higher:
+C:\Windows\SysWOW64\en-US\runonce.exe.mui
+ 
+
+
+
+
+在 Windows 2000、 Windows XP 和 Windows Server 2003 中，默认情况下存在的 RunOnceEx 注册表项︰
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx
+
+在 Windows Vista，Windows Server 2008，Windows 7 和 Windows Server 2008 R2。默认情况下不存在的 RunOnceEx 注册表项︰
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx 键
+
+RunOnceEx 示例，运行记事本
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx
+标题="我设置标题"
+
+Flags= dword:00000002
+
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx\0001
+RunMyApp="| |notepad.exe"
+
+
+语法示例
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx
+Flags= dword:00000000
+
+标题="状态对话框标题"
+
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx\Depend
+0001= "
+xxx1"
+
+000
+X= "
+xxxx"
+
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx\0001
+Entry1= "MyApp1.exe"
+
+Entry
+X= "MyApp2.exe"
+
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx\000
+x
+
+备注：
+"xxx1，xxxx"是一个动态链接库 (DLL) 或.ocx 文件名称 （如 My.ocx 或 My.dll）。
+"0001，000x"部分名称。节名称可以是字母数字。
+"entry1，entryX"是要运行的程序文件所指向的字符串值的注册表。
+定义的值和子项
+
+标志是位于一个 DWORD 值
+要启用/禁用以下设置的RunOnceEx键。
+
+
+值	函数	函数定义
+0x00000000	默认	禁用所有功能
+0x00000004	检查外壳程序状态	验证准备好接受 OLE 命令外壳程序
+0x00000008	无错误对话框	不显示错误对话框
+0x00000010	创建错误日志文件	创建 C:\Windows\RunOnceEx.err 文件，如果出现错误
+0x00000020	创建执行日志文件	创建一个 C:\Windows\RunOnceEx.log 文件，命令的状态
+0x00000040	无异常捕获	没有捕获注册 Dll 时发生的异常
+0x00000080	无状态对话框	RunOnceEx 运行时不显示状态对话框
+
+这些值是累积的。如果您希望"无状态对话框"和"创建错误日志文件"，设置为十六进制值 90 (80 + 10) 的标志。
+
+
+标题是一个字符串值，您可以使用填充在状态对话框标题。
+
+
+"
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx\Depend注册表项包含.dll 文件和.ocx 文件应保留在内存中加载时运行 RunOnceEx 的所有部分。
+
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx\000X注册表项包含要运行的条目。以下各节按字母顺序运行。因此，
+...\RunOnceEx\0001节处理之前
+...\RunOnceEx\0002section.
+
+
+字符串中的值
+...RunOnceEx\000
+x节包含的部分应运行的命令。格式为︰
+"
+DllFileName|
+FunctionName|
+CommandLineArguements"
+
+
+-或者-
+
+
+"||
+命令参数"
+
+
+例如︰
+"第 1 行"="| |my.exe-安静-url http://www.microsoft.com/"
+
+"Line2"="shdocvw.dll|DllRegisterServer"
+运行第 1 行"my.exe-安静-url http://www.microsoft.com/"命令行。行 2 运行中 Shdocvw.dll DllRegisterServer 函数。
+
+
+"
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx\000
+x\Depend
+注册表项包含.dll 文件和.ocx 文件应保留在内存中时部分
+000
+x程序在运行。
+
+有关详细信息，请单击下面的文章编号，以查看 Microsoft 知识库中相应的文章：
+
+RunOnceEx 注册表项的232487说明
+
+232509 RunOnceEx 注册表项的语法
+
+关于 RunOnce 请求的详细信息，请访问下面的 Microsoft 网站︰
+http://msdn.microsoft.com/en-us/library/ms940034(WinEmbedded.5).aspx
+有关详细信息，请访问下面的 Microsoft 网站︰
+深入查看第一个启动代理 (标准 2009)http://msdn.microsoft.com/en-us/library/dd450713.aspx
